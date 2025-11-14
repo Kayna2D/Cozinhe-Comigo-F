@@ -1,17 +1,17 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5150/CozinheComigoAPI';
 
 class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public body?: any) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
 export const api = {
-  async request(endpoint: string, options: RequestInit = {}) {
+  async request(endpoint: string, options: RequestInit = {}, retryOnAuthFailure: boolean = true) {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem('token');
-    
+
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -22,11 +22,36 @@ export const api = {
     };
 
     const response = await fetch(url, config);
-    
+
     if (!response.ok) {
-      throw new ApiError(response.status, `HTTP error! status: ${response.status}`);
+      let body: any = undefined;
+      try {
+        body = await response.clone().json();
+      } catch {
+        try {
+          body = await response.clone().text();
+        } catch {
+          body = undefined;
+        }
+      }
+
+      const message = body?.message || body?.returnMessage || body?.ReturnMessage || `HTTP error! status: ${response.status}`;
+
+      // If backend says token is invalid/expired, remove it and retry once without auth
+      const errMsg = String(message ?? '').toLowerCase();
+      if (retryOnAuthFailure && (errMsg.includes('invalid or expired authentication token') || errMsg.includes('invalid or expired authentication'))) {
+        localStorage.removeItem('token');
+        // retry without token header
+        const newHeaders: any = { ...config.headers };
+        if (newHeaders['requesterUserToken']) delete newHeaders['requesterUserToken'];
+        if (newHeaders['RequesterUserToken']) delete newHeaders['RequesterUserToken'];
+
+        return this.request(endpoint, { ...options, headers: newHeaders }, false);
+      }
+
+      throw new ApiError(response.status, message, body);
     }
-    
+
     return response.json();
   },
 

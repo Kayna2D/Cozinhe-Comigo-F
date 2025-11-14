@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import RecipeCard from "@/components/RecipeCard";
 import { Search } from "lucide-react";
 import { Recipe } from "@/types/recipe";
+import { recipeService } from "@/services/recipeService";
 
 const categories = [
   { label: "Todas as receitas", value: "all" },
@@ -22,127 +23,83 @@ const categories = [
 
 ];
 
-const mockRecipes: Recipe[] = [
-  {
-    id: "1",
-    title: "Bife Grelhado",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 5,
+const backendCategoryForTag: { [key: string]: string } = {
+  main: "Prato Principal",
+  dessert: "Sobremesas",
+  pasta: "Massas",
+  salad: "Saladas",
+  vegetarian: "Vegetariana",
+  easy: "Fácil",
+  snack: "Lanche",
+  lowcarb: "Low Carb",
+  lactosefree: "Sem Lactose",
+  seafood: "Frutos do Mar",
+  breakfast: "Café da Manhã",
+};
+
+function mapReadDtoToRecipe(dto: any): Recipe {
+  const mapCategoryToTag = (cat: string) => {
+    const found = Object.entries(backendCategoryForTag)
+      .find(([, v]) => v.toLowerCase() === (cat ?? "").toLowerCase());
+    if (found) return found[0];
+    return (cat ?? "").toLowerCase().replace(/\s+/g, '');
+  };
+
+  return {
+    id: String(dto.id),
+    title: dto.title ?? "",
+    image: dto.imageUrl ?? "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
+    rating: dto.averageRating ?? 0,
     author: {
-      id: "user1",
-      name: "Rafaela Dutra",
-      email: "rafaela@email.com"
+      id: "",
+      name: "Desconhecido",
+      email: ""
     },
-    tags: ["main", "easy", "lowcarb"],
-  },
-  {
-    id: "2",
-    title: "Pão Torrado",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.7,
-    author: {
-      id: "user2",
-      name: "Tomás Valladares",
-      email: "tomas@email.com"
-    },
-    tags: ["breakfast", "snack", "vegetarian"],
-  },
-  {
-    id: "3",
-    title: "Bolo de Framboesa",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.8,
-    author: {
-      id: "user3",
-      name: "Monique Bueno",
-      email: "monique@email.com"
-    },
-    tags: ["dessert", "vegetarian"],
-  },
-  {
-    id: "4",
-    title: "Macarrão Cozido",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.8,
-    author: {
-      id: "user1",
-      name: "Rafaela Dutra",
-      email: "rafaela@email.com"
-    },
-    tags: ["main", "pasta", "seafood"],
-  },
-  {
-    id: "5",
-    title: "Salada de Vegetais",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.6,
-    author: {
-      id: "user1",
-      name: "Rafaela Dutra",
-      email: "rafaela@email.com"
-    },
-    tags: ["salad", "vegetarian", "easy"],
-  },
-  {
-    id: "6",
-    title: "Carne de Porco",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.5,
-    author: {
-      id: "user4",
-      name: "José Luiz",
-      email: "jose@email.com"
-    },
-    tags: ["main", "easy"],
-  },
-  {
-    id: "7",
-    title: "Salmão Ensopado",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.1,
-    author: {
-      id: "user5",
-      name: "Adriana Germano",
-      email: "adrian@email.com"
-    },
-    tags: ["main", "seafood", "lowcarb"],
-  },
-  {
-    id: "8",
-    title: "Hambúrguer",
-    image: "https://images.unsplash.com/photo-1612690119274-8819a81c13a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-    rating: 4.5,
-    author: {
-      id: "user1",
-      name: "Rafaela Dutra",
-      email: "rafaela@email.com"
-    },
-    tags: ["main", "easy" ],
-  },
-];
+    tags: Array.isArray(dto.categories) ? dto.categories.map(mapCategoryToTag) : []
+  } as unknown as Recipe;
+}
 
 export default function Index() {
   const [activeTag, setActiveTag] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState<number | null>(null);
   //const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       setLoading(true);
-      // TODO: Substituir por API real
-      // const response = await fetch('/api/recipes');
-      // const data = await response.json();
-      
-      setTimeout(() => {
-        setRecipes(mockRecipes);
+      try {
+        const params: any = {
+          PageSize: 50,
+          PageNumber: 1,
+        };
+
+        if (searchTerm) params.TitleSearch = searchTerm;
+
+        if (activeTag && activeTag !== "all") {
+          const backendCat = backendCategoryForTag[activeTag];
+          if (backendCat) params.Categories = [backendCat];
+        }
+
+        const res = await recipeService.getRecipes(params);
+        // Caso a API retorne o formato do prompt:
+        const items = res?.returnObject ?? [];
+        const mapped = items.map((r: any) => mapReadDtoToRecipe(r));
+        setRecipes(mapped);
+        setTotalItems(res?.totalItems ?? mapped.length);
+      } catch (err) {
+        console.error("Erro ao buscar receitas:", err);
+        setRecipes([]);
+        setTotalItems(0);
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
     fetchRecipes();
-  }, []);
+  }, [activeTag, searchTerm]);
 
   const filteredRecipes = recipes.filter(recipe => {
     const matchesTag = activeTag === "all" || recipe.tags.includes(activeTag);

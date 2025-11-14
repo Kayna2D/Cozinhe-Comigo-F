@@ -170,13 +170,16 @@ namespace Cozinhe_Comigo_API.Controllers
                     ));
                 }
 
-                // Se o usuário filtrou receitas privadas, o ID precisa ser dele mesmo
-                if (!filter.UserId.HasValue || token.UserId != filter.UserId.Value) {
-                    return BadRequest(new ReturnDto<List<Recipe>>(
-                        EInternStatusCode.BAD_REQUEST,
-                        "To view a private recipe, the UserId in filter must match the authenticated user.",
-                        null
-                    ));
+                // Se o usuário explicitamente solicitou receitas privadas (IsPublic == false),
+                // então o UserId no filtro precisa corresponder ao usuário autenticado.
+                if (filter.IsPublic.HasValue && filter.IsPublic.Value == false) {
+                    if (!filter.UserId.HasValue || token.UserId != filter.UserId.Value) {
+                        return BadRequest(new ReturnDto<List<Recipe>>(
+                            EInternStatusCode.BAD_REQUEST,
+                            "To view a private recipe, the UserId in filter must match the authenticated user.",
+                            null
+                        ));
+                    }
                 }
             }
 
