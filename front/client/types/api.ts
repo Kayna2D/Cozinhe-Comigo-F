@@ -105,8 +105,8 @@ export interface CreateAvaliationDto {
 }
 
 export interface AvaliationResponse {
-  InternStatusCode: number;
-  ReturnMessage: string;
+  internStatusCode: number;
+  returnMessage: string;
   Data: Avaliation;
 }
 

@@ -102,9 +102,11 @@ export default function RecipeDetail() {
     // Verificar se usuário está autenticado
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
+    
 
     if (!token || !userId) {
       setError("Você precisa estar autenticado para avaliar uma receita");
+      alert("Você precisa estar autenticado para avaliar uma receita");
       navigate("/login");
       return;
     }
@@ -122,17 +124,14 @@ export default function RecipeDetail() {
 
       const response = await recipeService.createAvaliation(avaliationData);
 
-      if (response.InternStatusCode === 0) { // 0 = sucesso
-        // Adicionar avaliação à lista
-        setReviews((prev) => [response.Data, ...prev]);
+      if (response.internStatusCode === 0) { // 0 = sucesso
+        // Limpa inputs e força reload da página (comportamento F5)
         setUserRating(0);
         setUserComment("");
-        setSuccessMessage("Avaliação enviada com sucesso!");
-        
-        // Limpar mensagem de sucesso após 3 segundos
-        setTimeout(() => setSuccessMessage(null), 3000);
+        // Forçar recarregamento completo para refletir mudanças no servidor
+        window.location.reload();
       } else {
-        setError(response.ReturnMessage || "Erro ao enviar avaliação");
+        setError(response.returnMessage || "Erro ao enviar avaliação");
       }
     } catch (err: any) {
       console.error("Erro ao enviar avaliação:", err);
@@ -248,9 +247,13 @@ export default function RecipeDetail() {
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-4">
               {recipe.categories && recipe.categories.length > 0 && (
-                <span className="px-2 py-1 rounded-full text-xs font-medium text-white tracking-tight bg-purple-600">
-                  {recipe.categories[0]}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {recipe.categories.map((cat, i) => (
+                    <span key={`cat-${i}`} className="px-2 py-1 rounded-full text-xs font-medium text-white tracking-tight bg-purple-600">
+                      {cat}
+                    </span>
+                  ))}
+                </div>
               )}
               <span className="text-xs font-medium text-black/50 tracking-tight">
                 Postada em: {new Date(recipe.createdAt).toLocaleDateString("pt-BR")}
