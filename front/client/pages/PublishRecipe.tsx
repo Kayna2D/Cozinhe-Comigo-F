@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Header from "@/components/Header";
+import HeaderSwitcher from "@/components/HeaderSwitcher";
 import Footer from "@/components/Footer";
 import { UploadCloud, X, Plus, Video, User } from "lucide-react";  
 import { ca } from "date-fns/locale";
@@ -203,7 +203,7 @@ export default function PublishRecipe() {
 
   return (
     <div className="min-h-screen bg-sky-blue flex flex-col">
-      <Header />
+      <HeaderSwitcher />
       
       <main className="flex-1 flex flex-col items-center px-6 py-10">
         <h1 className="text-5xl font-bold text-black mb-12">Publicar Receita</h1>

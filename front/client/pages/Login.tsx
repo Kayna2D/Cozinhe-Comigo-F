@@ -49,7 +49,9 @@ export default function Login() {
         localStorage.setItem('token', response.token);
         localStorage.setItem('userId', response.user.id.toString());
         localStorage.setItem('user', JSON.stringify(response.user));
-        
+        // Notify app that auth state changed (HeaderSwitcher listens to this)
+        window.dispatchEvent(new Event('authChanged'));
+
         navigate('/');
       } else {
         setError(response.message || "Erro ao fazer login. Tente novamente.");

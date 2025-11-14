@@ -1,6 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
+    // Notify other parts of the app
+    window.dispatchEvent(new Event("authChanged"));
+    navigate("/");
+  };
+
   return (
     <header className="bg-sky-blue w-full">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -40,7 +51,7 @@ export default function Header() {
           >
             Perfil
           </Link>
-          <button className="px-5 py-3.5 bg-dark-brown text-white rounded-lg hover:bg-light-brown transition-colors font-medium text-base">
+          <button onClick={handleLogout} className="px-5 py-3.5 bg-dark-brown text-white rounded-lg hover:bg-light-brown transition-colors font-medium text-base">
             Logout
           </button>
         </nav>

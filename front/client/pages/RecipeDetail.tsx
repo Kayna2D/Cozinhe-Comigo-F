@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "@/components/Header";
+import HeaderSwitcher from "@/components/HeaderSwitcher";
 import Footer from "@/components/Footer";
 import StarRating from "@/components/StarRating";
 import { ArrowLeft, Download, Heart, Star, AlertCircle, Loader } from "lucide-react";
@@ -147,7 +147,7 @@ export default function RecipeDetail() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-sky-blue flex flex-col">
-        <Header />
+        <HeaderSwitcher />
         <main className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <Loader className="w-8 h-8 animate-spin text-dark-brown" />
@@ -163,7 +163,7 @@ export default function RecipeDetail() {
   if (error && !recipe) {
     return (
       <div className="min-h-screen bg-sky-blue flex flex-col">
-        <Header />
+        <HeaderSwitcher />
         <main className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4 max-w-md">
             <AlertCircle className="w-12 h-12 text-red-500" />
@@ -188,7 +188,7 @@ export default function RecipeDetail() {
   if (!recipe) {
     return (
       <div className="min-h-screen bg-sky-blue flex flex-col">
-        <Header />
+        <HeaderSwitcher />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-lg text-dark-brown">Receita não encontrada</div>
         </main>
@@ -204,7 +204,7 @@ export default function RecipeDetail() {
 
   return (
     <div className="min-h-screen bg-sky-blue flex flex-col">
-      <Header />
+      <HeaderSwitcher />
       
       <main className="flex-1 max-w-[956px] w-full mx-auto px-6 py-10">
         <div className="bg-white rounded-lg p-3 flex flex-col gap-12">

@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import HeaderSwitcher from "@/components/HeaderSwitcher";
 import Footer from "@/components/Footer";
 
 interface PlaceholderProps {
@@ -8,7 +8,7 @@ interface PlaceholderProps {
 export default function Placeholder({ title }: PlaceholderProps) {
   return (
     <div className="min-h-screen bg-sky-blue flex flex-col">
-      <Header />
+      <HeaderSwitcher />
       
       <main className="flex-1 flex items-center justify-center px-6 py-20">
         <div className="text-center max-w-2xl">
